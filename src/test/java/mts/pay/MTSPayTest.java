@@ -36,8 +36,8 @@ public class MTSPayTest {
         options.addArguments("--headless");
         driver = new ChromeDriver(options);
         driver.get("https://www.mts.by/");
-        Thread.sleep(5000);
-        if (driver.findElement(By.id("cookie-agree")).isDisplayed())
+        Thread.sleep(500);
+        if (driver.findElement(By.id("bxdynamic_cookies-agreement-gtm_end")).isDisplayed())
             driver.findElement(By.id("cookie-agree")).click();
         payForm = driver.findElement(By.id("pay-section"));
     }
@@ -73,14 +73,15 @@ public class MTSPayTest {
     @SneakyThrows
     @Test
     void checkButton() {
-        Thread.sleep(5000);
+        float expected = 158.06F;
         payForm.findElement(By.id("connection-phone")).sendKeys("297777777");
-        payForm.findElement(By.id("connection-sum")).sendKeys("123");
+        payForm.findElement(By.id("connection-sum")).sendKeys(Float.toString(expected));
         payForm.findElement(By.className("button__default")).click();
         Thread.sleep(5000);
         WebElement iframePay = driver.findElement(By.className("bepaid-iframe"));
         driver.switchTo().frame(iframePay);
         String headFrame = driver.findElement(By.className("pay-description__cost")).getText();
-        System.out.println(headFrame);
+        Float actual = DataHelper.getCostInfo(headFrame);
+        assertEquals(expected, actual);
     }
 }
